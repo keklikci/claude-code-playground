@@ -3,17 +3,24 @@
   "permissions": {
     "allow": [
       "Bash(pytest:*)",
-      "Bash(python -m pytest:*)",
+      "PowerShell(pytest:*)",
       "Bash(ruff:*)",
-      "Bash(python -m ruff:*)"
+      "PowerShell(ruff:*)",
+      "Bash(python -m pytest:*)",
+      "PowerShell(python -m pytest:*)",
+      "Bash(python -m ruff:*)",
+      "PowerShell(python -m ruff:*)"
     ],
     "ask": [
       "Bash(curl:*)",
       "Bash(wget:*)",
+      "PowerShell(Invoke-WebRequest:*)",
+      "PowerShell(Invoke-RestMethod:*)",
       "WebFetch"
     ],
     "deny": [
       "Bash(rm:*)",
+      "PowerShell(Remove-Item:*)",
       "Read(./.env)",
       "Read(./secrets/**)"
     ]
