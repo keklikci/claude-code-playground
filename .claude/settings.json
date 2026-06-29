@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(pytest:*)",
+      "PowerShell(pytest:*)",
+      "Bash(ruff:*)",
+      "PowerShell(ruff:*)",
+      "Bash(python -m pytest:*)",
+      "PowerShell(python -m pytest:*)",
+      "Bash(python -m ruff:*)",
+      "PowerShell(python -m ruff:*)"
+    ],
+    "ask": [
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "PowerShell(Invoke-WebRequest:*)",
+      "PowerShell(Invoke-RestMethod:*)",
+      "WebFetch"
+    ],
+    "deny": [
+      "Bash(rm:*)",
+      "PowerShell(Remove-Item:*)",
+      "Read(./.env)",
+      "Read(./secrets/**)"
+    ]
+  }
+}
