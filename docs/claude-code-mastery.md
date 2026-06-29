@@ -25,7 +25,7 @@ exact capabilities worth mastering.
 - Every major capability gets one module as its center of gravity, and is reinforced later (see the matrix at the bottom).
 
 > **Progress tracker** — tick these as you finish:
-> - [ ] Module 0 — Orientation & the working loop
+> - [x] Module 0 — Orientation & the working loop
 > - [x] Module 1 — Real project work + settings & permissions
 > - [ ] Module 2 — Instructions & memory (CLAUDE.md)
 > - [ ] Module 3 — Core feature work in Plan mode (OSV.dev)
