@@ -27,7 +27,7 @@ exact capabilities worth mastering.
 > **Progress tracker** — tick these as you finish:
 > - [x] Module 0 — Orientation & the working loop
 > - [x] Module 1 — Real project work + settings & permissions
-> - [ ] Module 2 — Instructions & memory (CLAUDE.md)
+> - [x] Module 2 — Instructions & memory (CLAUDE.md)
 > - [ ] Module 3 — Core feature work in Plan mode (OSV.dev)
 > - [ ] Module 4 — Skills (built‑in + authoring)
 > - [ ] Module 5 — Subagents & custom agents
