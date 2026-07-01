@@ -65,31 +65,12 @@ Tests and `ruff` are pre‑allowed in `.claude/settings.json`; network commands 
 
 ### Git / workflow
 
-- One branch per module off `main` (e.g. `module/2-instructions-memory`); one PR per module.
-- **Conventional Commits with a scope**, e.g. `feat(parsers): ...`, `docs(memory): ...`,
-  `refactor(parsers): ...`.
+General commit / branch / PR conventions (Conventional Commits, one branch & PR per unit of
+work, required PR metadata, and the PR description structure) live in my user
+`~/.claude/CLAUDE.md`. Project-specific bindings:
 
-#### Pull requests
-
-Every PR must have **all** of these filled consistently (reference: PR #1):
-
-- **Title** in `prefix: text` form, prefix = the module — e.g. `Module 2: instructions & memory
-  + pyproject parser`. (PR-title convention, distinct from the commit style above.)
-- **Assignee**: `@me` (keklikci). **Labels**: match the work — a docs+feature PR gets both
-  `documentation` and `enhancement`. **Milestone**: one per module, same `prefix: text` shape
-  (e.g. `Module 2: Instructions & memory`); create it if missing. **Project**: always
-  `depaudit — supply-chain scanner` (user project #3).
-- `gh pr create` doesn't reliably set these, so: create → `gh pr edit` (title/assignee/labels/
-  milestone) → `gh project item-add 3 --owner "@me" --url <pr>` → verify with
-  `gh pr view <n> --json title,assignees,labels,milestone,projectItems`.
-
-**PR description** follows this structure every time (see PR #2):
-
-1. **Brief description** — one or two sentences on what the PR does.
-2. **Changes** — bullets, grouped by commit scope.
-3. **Mastery check** — how the module's roadmap check was satisfied.
-4. **Verification** — commands run and their results (`pytest`, `ruff check .`, CLI).
-5. A closing line **confirming all commits are signed**.
+- **PR titles**: `Module N: text` (e.g. `Module 2: instructions & memory + pyproject parser`).
+- **GitHub Project**: `depaudit — supply-chain scanner` (user project #3).
 
 ### Memory notes
 
