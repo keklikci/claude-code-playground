@@ -57,7 +57,8 @@ Tests and `ruff` are pre‑allowed in `.claude/settings.json`; network commands 
   justified on security grounds. Every dependency is attack surface.
 - **No bare/blind `except`** — always catch specific exceptions (enforced by ruff `BLE`).
 - **All network I/O goes through `depaudit/net.py`** (Module 3+) with explicit **timeouts** and
-  retries. Never call `requests`/`urllib` directly from feature code.
+  retries. Never call `requests`/`urllib` directly from feature code. This applies to every
+  OSV.dev API call — always pass an explicit timeout; never rely on library defaults.
 - **Treat all external input as untrusted:** requirements files, environment metadata, OSV/API
   responses, and (later) MCP tool output.
 - Don't blanket‑ignore `S`/`B` lints — fix them, or use a narrow `# noqa: <code>` with a reason.
