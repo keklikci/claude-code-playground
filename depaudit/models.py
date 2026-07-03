@@ -48,3 +48,25 @@ class Finding:
     summary: str
     severity: str
     url: str
+
+
+@dataclass(frozen=True, slots=True)
+class Issue:
+    """A single problem flagged by a check (see :mod:`depaudit.checks`).
+
+    The lightweight, general-purpose result type for the check plugins added from
+    Module 5 on (typosquatting, license, integrity, …). The OSV engine keeps its own
+    richer :class:`Finding`; the two may converge once the check surface stabilizes.
+
+    Attributes:
+        dependency: The :class:`Dependency` the issue concerns.
+        check: Name of the check that produced this issue, e.g. ``"typosquat"``.
+        severity: Severity band — one of ``"CRITICAL"``, ``"HIGH"``, ``"MODERATE"``,
+            ``"LOW"``, or ``"INFO"``.
+        message: Human-readable description of the problem (may include a URL).
+    """
+
+    dependency: Dependency
+    check: str
+    severity: str
+    message: str
