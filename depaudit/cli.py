@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from collections.abc import Sequence
 from pathlib import Path
 
-from depaudit.models import Dependency
+from depaudit import net, osv
+from depaudit.models import Dependency, Finding
 from depaudit.parsers import parse_environment, parse_pyproject, parse_requirements
 
 
@@ -22,6 +24,62 @@ def _format_table(deps: Sequence[Dependency]) -> str:
     return "\n".join(rows)
 
 
+def _format_findings(findings: Sequence[Finding], *, skipped: int = 0) -> str:
+    """Render vulnerability findings as an aligned text table.
+
+    Args:
+        findings: Findings to display, already sorted by the caller.
+        skipped: Count of unpinned dependencies that couldn't be queried.
+    """
+    if not findings:
+        summary = "No known vulnerabilities found."
+    else:
+        sev_w = max(len("SEVERITY"), *(len(f.severity) for f in findings))
+        pkg_w = max(len("PACKAGE"), *(len(f.dependency.name) for f in findings))
+        ver_w = max(len("VERSION"), *(len(f.dependency.version or "-") for f in findings))
+        vuln_w = max(len("VULN"), *(len(f.vuln_id) for f in findings))
+        header = (
+            f"{'SEVERITY':<{sev_w}}  {'PACKAGE':<{pkg_w}}  "
+            f"{'VERSION':<{ver_w}}  {'VULN':<{vuln_w}}  SUMMARY"
+        )
+        rows = [header]
+        rows += [
+            f"{f.severity:<{sev_w}}  {f.dependency.name:<{pkg_w}}  "
+            f"{(f.dependency.version or '-'):<{ver_w}}  {f.vuln_id:<{vuln_w}}  {f.summary}"
+            for f in findings
+        ]
+        affected = len({f.dependency.name for f in findings})
+        rows.append(f"\n{len(findings)} vulnerabilities across {affected} packages")
+        summary = "\n".join(rows)
+
+    if skipped:
+        summary += f"\n({skipped} unpinned dependencies skipped - pin a version to scan them)"
+    return summary
+
+
+def _load_deps(args: argparse.Namespace, parser: argparse.ArgumentParser) -> list[Dependency]:
+    """Load dependencies from the environment or a file, per shared parse/scan args."""
+    if args.env:
+        return parse_environment()
+    if args.path:
+        if Path(args.path).name == "pyproject.toml":
+            return parse_pyproject(args.path)
+        return parse_requirements(args.path)
+    parser.error("provide a requirements file path or use --env")
+
+
+def _add_source_args(sub_parser: argparse.ArgumentParser) -> None:
+    """Add the shared ``path`` / ``--env`` dependency-source arguments to a subparser."""
+    sub_parser.add_argument(
+        "path", nargs="?", help="Path to a requirements.txt-style file or a pyproject.toml."
+    )
+    sub_parser.add_argument(
+        "--env",
+        action="store_true",
+        help="Read the active Python environment instead of a file.",
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Construct the argument parser for the ``depaudit`` command."""
     parser = argparse.ArgumentParser(
@@ -33,14 +91,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_parse = sub.add_parser(
         "parse", help="List dependencies from a requirements file or the environment."
     )
-    p_parse.add_argument(
-        "path", nargs="?", help="Path to a requirements.txt-style file or a pyproject.toml."
-    )
-    p_parse.add_argument(
-        "--env",
-        action="store_true",
-        help="Read the active Python environment instead of a file.",
-    )
+    _add_source_args(p_parse)
+
+    p_scan = sub.add_parser("scan", help="Scan dependencies for known vulnerabilities via OSV.dev.")
+    _add_source_args(p_scan)
+
     return parser
 
 
@@ -50,16 +105,19 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.command == "parse":
-        if args.env:
-            deps = parse_environment()
-        elif args.path:
-            if Path(args.path).name == "pyproject.toml":
-                deps = parse_pyproject(args.path)
-            else:
-                deps = parse_requirements(args.path)
-        else:
-            parser.error("provide a requirements file path or use --env")
+        deps = _load_deps(args, parser)
         print(_format_table(deps))
+        return 0
+
+    if args.command == "scan":
+        deps = _load_deps(args, parser)
+        skipped = sum(1 for d in deps if not d.version)
+        try:
+            findings = osv.scan_dependencies(deps)
+        except net.NetworkError as exc:
+            print(f"depaudit: could not reach OSV.dev: {exc}", file=sys.stderr)
+            return 1
+        print(_format_findings(findings, skipped=skipped))
         return 0
 
     parser.error(f"unknown command: {args.command}")  # pragma: no cover
