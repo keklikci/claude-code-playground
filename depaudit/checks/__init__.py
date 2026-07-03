@@ -25,4 +25,23 @@ CHECKS: dict[str, Callable[[Sequence[Dependency]], list[Issue]]] = {
     "typosquat": _typosquat_run,
 }
 
-__all__ = ["CHECKS"]
+
+def run_all(deps: Sequence[Dependency]) -> list[Issue]:
+    """Run every registered check over ``deps`` and collect their issues.
+
+    Checks are best-effort and never raise (see ``depaudit/checks/CLAUDE.md``), so results
+    are simply concatenated in registry order; callers handle any display ordering.
+
+    Args:
+        deps: Dependencies to inspect.
+
+    Returns:
+        Every :class:`~depaudit.models.Issue` produced across all checks, in registry order.
+    """
+    issues: list[Issue] = []
+    for check in CHECKS.values():
+        issues.extend(check(deps))
+    return issues
+
+
+__all__ = ["CHECKS", "run_all"]
