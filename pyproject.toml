@@ -16,10 +16,14 @@ keywords = ["security", "supply-chain", "dependencies", "sca", "vulnerability"]
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "ruff>=0.6"]
+# The MCP server (depaudit/mcp_server.py) is the only part that needs a third-party
+# runtime dep; keeping it an extra preserves the core tool's zero-dependency footprint.
+mcp = ["mcp>=1.2"]
+dev = ["pytest>=8", "ruff>=0.6", "depaudit[mcp]"]
 
 [project.scripts]
 depaudit = "depaudit.cli:main"
+depaudit-mcp = "depaudit.mcp_server:main"
 
 [tool.setuptools.packages.find]
 include = ["depaudit*"]

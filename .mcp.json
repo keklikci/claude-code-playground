@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "depaudit": {
+      "command": "python",
+      "args": ["-m", "depaudit.mcp_server"]
+    },
+    "fetch": {
+      "command": "uvx",
+      "args": ["mcp-server-fetch"]
+    }
+  }
+}

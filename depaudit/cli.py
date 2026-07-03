@@ -5,11 +5,9 @@ from __future__ import annotations
 import argparse
 import sys
 from collections.abc import Sequence
-from pathlib import Path
 
-from depaudit import checks, net, osv
+from depaudit import checks, net, osv, parsers
 from depaudit.models import Dependency, Finding, Issue
-from depaudit.parsers import parse_environment, parse_pyproject, parse_requirements
 
 # Severity ordering for check issues (adds INFO to the OSV bands); used to sort most-severe first.
 _ISSUE_SEVERITY_RANK = {"CRITICAL": 0, "HIGH": 1, "MODERATE": 2, "LOW": 3, "INFO": 4}
@@ -87,27 +85,12 @@ def _format_issues(issues: Sequence[Issue]) -> str:
     return "\n".join(rows)
 
 
-def _run_checks(deps: Sequence[Dependency]) -> list[Issue]:
-    """Run every registered check over ``deps`` and collect their issues.
-
-    Checks are best-effort and never raise (see ``depaudit/checks/CLAUDE.md``), so results are
-    simply concatenated in registry order; the formatter handles ordering for display.
-    """
-    issues: list[Issue] = []
-    for check in checks.CHECKS.values():
-        issues.extend(check(deps))
-    return issues
-
-
 def _load_deps(args: argparse.Namespace, parser: argparse.ArgumentParser) -> list[Dependency]:
     """Load dependencies from the environment or a file, per shared parse/scan args."""
-    if args.env:
-        return parse_environment()
-    if args.path:
-        if Path(args.path).name == "pyproject.toml":
-            return parse_pyproject(args.path)
-        return parse_requirements(args.path)
-    parser.error("provide a requirements file path or use --env")
+    try:
+        return parsers.load_dependencies(args.path, env=args.env)
+    except ValueError as exc:
+        parser.error(str(exc))
 
 
 def _add_source_args(sub_parser: argparse.ArgumentParser) -> None:
@@ -175,7 +158,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         except net.NetworkError as exc:
             print(f"depaudit: could not reach OSV.dev: {exc}", file=sys.stderr)
             return 1
-        issues = _run_checks(deps)
+        issues = checks.run_all(deps)
         print(_format_findings(findings, skipped=skipped))
         print()
         print(_format_issues(issues))

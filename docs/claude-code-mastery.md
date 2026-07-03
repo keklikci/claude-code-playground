@@ -31,7 +31,7 @@ exact capabilities worth mastering.
 > - [x] Module 3 — Core feature work in Plan mode (OSV.dev)
 > - [x] Module 4 — Skills (built‑in + authoring your own)
 > - [x] Module 5 — Subagents & custom agents
-> - [ ] Module 6 — MCP servers (consume + build)
+> - [x] Module 6 — MCP servers (consume + build)
 > - [ ] Module 7 — Hooks & automation
 > - [ ] Module 8 — CI/CD, PR reviews & loops
 
