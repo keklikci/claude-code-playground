@@ -15,12 +15,14 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 
 from depaudit.checks.license import run as _license_run
+from depaudit.checks.typosquat import run as _typosquat_run
 from depaudit.models import Dependency, Issue
 
 #: Registry of available checks, keyed by check name. Populated by each check module and
 #: appended to by the ``/add-scanner`` skill when it scaffolds a new one.
 CHECKS: dict[str, Callable[[Sequence[Dependency]], list[Issue]]] = {
     "license": _license_run,
+    "typosquat": _typosquat_run,
 }
 
 __all__ = ["CHECKS"]
