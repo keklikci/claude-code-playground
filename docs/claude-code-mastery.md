@@ -30,7 +30,6 @@ exact capabilities worth mastering.
 > - [x] Module 2 — Instructions & memory (CLAUDE.md)
 > - [x] Module 3 — Core feature work in Plan mode (OSV.dev)
 > - [x] Module 4 — Skills (built‑in + authoring your own)
-> - [ ] Module 4 — Skills (built‑in + authoring)
 > - [ ] Module 5 — Subagents & custom agents
 > - [ ] Module 6 — MCP servers (consume + build)
 > - [ ] Module 7 — Hooks & automation
